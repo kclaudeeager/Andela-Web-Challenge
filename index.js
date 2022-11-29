@@ -1,131 +1,109 @@
+let index = 0;
+document.addEventListener("DOMContentLoaded" , () => {
+    let listDiv=document.getElementById("datalist");
+    let myBtn= document.getElementById('myBtn')
+    let close_modal = document.getElementById('close_modal')
+    let form = document.getElementById('form')
+    let close_details = document.getElementById('close_details')
+    let modal = document.getElementById("details-model")
+    let detailsDiv=document.getElementById("bookmark");
+    let filter = document.getElementById('filter')
 
-// When the user clicks the button, open the modal 
-const openModel=()=>{
-    //alert("Model")
-    const modal = document.getElementById("myModal");
-    console.log("style", modal)
-    modal.style.display = "block";
-}
+    let openModel=()=>{
+        //alert("Model")
+        let modal = document.getElementById("myModal");
+        console.log("style", modal)
+        modal.style.display = "block";
+    }
 // When the user clicks on <span> (x), close the modal
-const closeModel=()=>{
-    console.log("Closing")
-    const modal = document.getElementById("myModal");
-    modal.style.display = "none";
-}
-const closeDetailsModel=()=>{
-    console.log("Closing")
-    const modal = document.getElementById("details-model");
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    const modal1 = document.getElementById("myModal");
-    const modal2= document.getElementById("details-model");
-  if (event.target == modal1) {
-    modal1.style.display = "none";
-  }
-  if(event.target==modal2 ){
-    modal2.style.display="none"
-  }
-}
-let bookmarks=[]
-let viewIds=[]
-let editIds=[]
-const saveBookMark=(event)=>{
-    
-    event.preventDefault();
-    const category=document.getElementById("category").value;
-    const title=document.getElementById("title").value;
-    const description=document.getElementById('description').value;
-    const link=document.getElementById("link").value;
-    const data={
-        category:category,
-        title:title,
-        description:description,
-        link:link
+    let closeModel=()=>{
+        console.log("Closing")
+        let modal = document.getElementById("myModal");
+        modal.style.display = "none";
     }
-    console.log("data: ",data)
-    bookmarks.push(data)
-    updateList(bookmarks)
-    for(let i=0;i<bookmarks.length;i++){
-        console.log("Book mark "+1);
-        console.log(bookmarks[i])
-       const viewId='view-'+i;
-        let viewbtn=document.getElementById(viewId)
-        console.log("Hello this is the button: ",viewbtn)
-        viewbtn.onclick=function(){
-           viewBookmark(bookmarks[i]);
-        }
+    let closeDetailsModel=()=>{
+        console.log("Closing")
+        let modal = document.getElementById("details-model");
+        modal.style.display = "none";
     }
-let filliteredBookmarks=[]
-let selected=null
-const filliter=document.getElementById("filliter");
-if(filliter!=null)
-filliter.addEventListener('change',function handelChange(event){
-    console.log("Change.......")
-    filliteredBookmarks=[]
-    console.log("Selected ",event.target.value)
-    selected=filliter.options[filliter.selectedIndex].value;
-    console.log("Found ",selected)
-    for(let i=0;i<bookmarks.length;i++){
 
-        if(selected!=null){
-            if(bookmarks[i].category==selected){
-                filliteredBookmarks.push(bookmarks[i])
+
+    myBtn.onclick = () => {
+        openModel()
+    }
+    close_modal.onclick = ()=> {
+        closeModel()
+    }
+    form.onsubmit = (event)=>{
+        saveBookMark(event)
+    }
+    close_details.onclick = ()=> {
+        closeDetailsModel()
+    }
+
+    filter.onchange = (event) => {
+        let category = event.target.value
+
+        listDiv.childNodes.forEach(each => {
+            if(each.id?.includes(category)){
+                each.style.display = 'block'
             }
+            else if(each && each.id) {
+                each.style.display = 'none'
+            }
+        })
+    }
+// When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        let modal1 = document.getElementById("myModal");
+        let modal2= document.getElementById("details-model");
+        if (event.target === modal1) {
+            modal1.style.display = "none";
+        }
+        if(event.target===modal2 ){
+            modal2.style.display="none"
         }
     }
-    updateList(filliteredBookmarks)
-    for(let i=0;i<filliteredBookmarks.length;i++){
 
-        console.log("Book mark "+1);
-        console.log(filliteredBookmarks[i])
-       const viewId='view-'+i;
+    let saveBookMark=(event)=>{
+
+        event.preventDefault();
+        let category=document.getElementById("category").value;
+        let title=document.getElementById("title").value;
+        let description=document.getElementById('description').value;
+        let link=document.getElementById("link").value;
+        let data={
+            id:++index,
+            category:category,
+            title:title,
+            description:description,
+            link:link
+        }
+        console.log("data: ",data)
+        addItem(data)
+        closeModel();
+    }
+
+
+    let viewBookmark=(bookmark)=>{
+        console.log(bookmark)
+        modal.style.display = "block";
+        let temp='<div><p class="title" id="bookmark-title">Bookmark details</p><div class="container"><div class="items-1 item"> <div  class="view-item view-item-1">Category:</div><div class="view-item view-item-2">'+bookmark.category+'</div></div><div class="items-2 item"> <div class="view-item view-item-1">Title: </div><div class="view-item view-item-2">'+bookmark.title+'</div></div> <div class="items-3 item"><div class="view-item view-item-1">Description:</div><div  class="view-item view-item-2">'+bookmark.description+'</div></div><div class="items-4 item"><div class="view-item view-item-1">Link:</div><div class="book-link view-item view-item-2" id="book-link"><a href='+bookmark.link+'>'+bookmark.link+'</a></div></div></div></div>'
+        detailsDiv.innerHTML=temp
+    }
+    function addItem(bookmark){
+        let viewId='view-'+bookmark.id;
+        let content = document.createElement('div');
+        content.id = bookmark.id+bookmark.category+"unique"
+        content.innerHTML =`<div class="elements"><div class="elements"><div class="element-1 title element">${bookmark.title}</div> <div class=" element element-3 view" id="${viewId}"><img alt="" src="view.png"/></div><div class="element element-4 edit" id="edit-${bookmark.id}"><img alt="" src="edit.png"/></div></div>`
+        listDiv.appendChild(content)
         let viewbtn=document.getElementById(viewId)
         console.log("Hello this is the button: ",viewbtn)
         viewbtn.onclick=function(){
-           viewBookmark(filliteredBookmarks[i]);
+            viewBookmark(bookmark);
         }
+
     }
+
 })
-}
-
-
-const viewBookmark=(bookmark)=>{
-    const modal = document.getElementById("details-model");
-    console.log("style", modal)
-    modal.style.display = "block";
-let temp='<div><p class="title" id="bookmark-title">Bookmark details</p><div class="container"><div class="items-1 item"> <div  class="view-item view-item-1">Category:</div><div class="view-item view-item-2">'+bookmark.category+'</div></div><div class="items-2 item"> <div class="view-item view-item-1">Title: </div><div class="view-item view-item-2">'+bookmark.title+'</div></div> <div class="items-3 item"><div class="view-item view-item-1">Description:</div><div  class="view-item view-item-2">'+bookmark.description+'</div></div><div class="items-4 item"><div class="view-item view-item-1">Link:</div><div class="book-link view-item view-item-2" id="book-link"><a href='+bookmark.link+'>'+bookmark.link+'</a></div></div></div></div>'
-let detailsDiv=document.getElementById("bookmark");
-detailsDiv.innerHTML=temp
-}
-const updateList=(bookmarks)=>{
-console.log("Clicking......")
-let listDiv=document.getElementById("datalist");
-listDiv.innerHTML=null
-listDiv.innerHTML+='<div class="main"><div class="filliter">filliter: <select name="select" id="filliter"><option id="" value="">Choose one</option><option id="life" value="Life">Life</option><option id="music" value="Music">Music</option><option id="history" value="History">History</option><option id="football" value="Football">Football</option><option id="movie" value="Movie">Movie</option></select></di>'
-for(let index=0;index<bookmarks.length;index++){
-    let bookmark=bookmarks[index]
-    let category=bookmark.category
-let classes="item-"+(index+1)+" elements"
-console.log("Index",index)
-
-console.log(listDiv)
-const title=""+bookmark.title
-const link=""+bookmark.link
-console.log("title: ",title)
-
-
-listDiv.innerHTML+='<div class='+classes+'><div class="elements"><div class="element-1 title element">'+title+'</div> <div class=" element element-3 view" id="view-'+index+'"><img src="view.png"/></div><div class="element element-4 edit" id="edit-'+index+'"><img src="edit.png"/></div></div>'
-let id='view-'+index
-viewIds.push(id)
-editIds.push(id)
-
-closeModel();
-
-}
-listDiv.innerHTML+='</div>'
-
-
-}
+// When the user clicks the button, open the modal 
