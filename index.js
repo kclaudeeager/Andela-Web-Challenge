@@ -8,13 +8,15 @@ document.addEventListener("DOMContentLoaded" , () => {
     let modal = document.getElementById("details-model")
     let detailsDiv=document.getElementById("bookmark");
     let filter = document.getElementById('filter')
-
+  
     let openModel=()=>{
         //alert("Model")
         let modal = document.getElementById("myModal");
         console.log("style", modal)
         modal.style.display = "block";
+     
     }
+   
 // When the user clicks on <span> (x), close the modal
     let closeModel=()=>{
         console.log("Closing")
@@ -72,16 +74,34 @@ document.addEventListener("DOMContentLoaded" , () => {
         let title=document.getElementById("title").value;
         let description=document.getElementById('description').value;
         let link=document.getElementById("link").value;
+        let author=document.getElementById("author").value
         let data={
-            id:++index,
             category:category,
             title:title,
             description:description,
-            link:link
+            link:link,
+            author:author
         }
         console.log("data: ",data)
-        addItem(data)
+        // 
         closeModel();
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        
+        const raw = JSON.stringify(data);
+        
+        const requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+        
+        fetch("http://localhost:8080/bookmark", requestOptions)
+          .then(response => response.text())
+          .then(result => console.log(result))
+          .catch(error => console.log('error', error));
+          addItem(data)
     }
 
 
@@ -92,10 +112,10 @@ document.addEventListener("DOMContentLoaded" , () => {
         detailsDiv.innerHTML=temp
     }
     function addItem(bookmark){
-        let viewId='view-'+bookmark.id;
+        let viewId='view-'+bookmark._id;
         let content = document.createElement('div');
         content.id = bookmark.id+bookmark.category+"unique"
-        content.innerHTML =`<div class="elements"><div class="elements"><div class="element-1 title element">${bookmark.title}</div> <div class=" element element-3 view" id="${viewId}"><img alt="" src="view.png"/></div><div class="element element-4 edit" id="edit-${bookmark.id}"><img alt="" src="edit.png"/></div></div>`
+        content.innerHTML =`<div class="elements"><div class="element-1 title element">${bookmark.title}</div> <div class=" element element-3 view" id="${viewId}"><img alt="" src="view.png"/></div><div class="element element-4 edit" id="edit-${bookmark.id}"><i class="fa-thin fa-pen-to-square"></i></div>`
         listDiv.appendChild(content)
         let viewbtn=document.getElementById(viewId)
         console.log("Hello this is the button: ",viewbtn)
@@ -104,6 +124,26 @@ document.addEventListener("DOMContentLoaded" , () => {
         }
 
     }
+    const getBookmarks=()=>{
+        const requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+          };
+          
+          fetch("http://localhost:8080/bookmark", requestOptions)
+            .then(response => response.text())
+            .then(result => JSON.parse(result))
+            .then(data=>{
+                data.forEach(item=>{
+                    console.log(item)
+                    addItem(item)
+                
+                })
+            })
+            .catch(error => console.log('error', error));
+    }
+    getBookmarks()
 
 })
 // When the user clicks the button, open the modal 
+
